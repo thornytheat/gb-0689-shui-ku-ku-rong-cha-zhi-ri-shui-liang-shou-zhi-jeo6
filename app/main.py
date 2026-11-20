@@ -39,6 +39,12 @@ def create_app():
     def get_run(run_id): return jsonify(store.fetch(run_id))
     @app.get("/api/history")
     def history(): return jsonify(store.history())
+    @app.get("/api/alerts")
+    def alerts():
+        run_id=request.args.get("run")
+        if not run_id: raise DomainError("PARAMS","缺少批次参数")
+        result=store.fetch(run_id)
+        return jsonify({"run_id":run_id,"alerts":result.get("alerts",[]),"trail":store.alert_trail(run_id)})
     @app.post("/api/review/<run_id>")
     def review(run_id):
         data=request.get_json(silent=True)
